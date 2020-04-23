@@ -11,9 +11,9 @@ namespace Alura.ListaLeitura.App.Repositorio
     {
         private static readonly string nomeArquivoCSV = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + "\\Repositorio\\livros.csv";
 
-        private ListaDeLeitura _paraLer;
-        private ListaDeLeitura _lendo;
-        private ListaDeLeitura _lidos;
+        public ListaDeLeitura ParaLer { get; }
+        public ListaDeLeitura Lendo { get; }
+        public ListaDeLeitura Lidos { get; }
 
         public LivroRepositorioCSV()
         {
@@ -54,16 +54,12 @@ namespace Alura.ListaLeitura.App.Repositorio
                 }
             }
 
-            _paraLer = new ListaDeLeitura("Para Ler", arrayParaLer.ToArray());
-            _lendo = new ListaDeLeitura("Lendo", arrayLendo.ToArray());
-            _lidos = new ListaDeLeitura("Lidos", arrayLidos.ToArray());
+            ParaLer = new ListaDeLeitura("Para Ler", arrayParaLer.ToArray());
+            Lendo = new ListaDeLeitura("Lendo", arrayLendo.ToArray());
+            Lidos = new ListaDeLeitura("Lidos", arrayLidos.ToArray());
         }
 
-        public ListaDeLeitura ParaLer => _paraLer;
-        public ListaDeLeitura Lendo => _lendo;
-        public ListaDeLeitura Lidos => _lidos;
-
-        public IEnumerable<Livro> Todos => _paraLer.Livros.Union(_lendo.Livros).Union(_lidos.Livros);
+        public IEnumerable<Livro> Todos => ParaLer.Livros.Union(Lendo.Livros).Union(Lidos.Livros);
 
         public void Incluir(Livro livro)
         {
