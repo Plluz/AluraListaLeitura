@@ -5,8 +5,8 @@ namespace Alura.ListaLeitura.App.Negocio
     public class Livro
     {
         public int Id { get; set; }    
-        public string Titulo { get; set; }
         public string Autor { get; set; }
+        public string Titulo { get; set; }
         public ListaDeLeitura Lista { get; set; }
 
         public string Detalhes()
@@ -22,7 +22,7 @@ namespace Alura.ListaLeitura.App.Negocio
 
         public override string ToString()
         {
-            return $"{Titulo} - {Autor}";
+            return $"{Titulo} ({Autor})";
         }
     }
 }

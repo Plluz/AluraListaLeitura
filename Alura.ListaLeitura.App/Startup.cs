@@ -1,6 +1,10 @@
-﻿using Alura.ListaLeitura.App.Repositorio;
+﻿using Alura.ListaLeitura.App.Negocio;
+using Alura.ListaLeitura.App.Repositorio;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,26 +15,30 @@ namespace Alura.ListaLeitura.App
 
         public void Configure(IApplicationBuilder app)
         {
-            app.Run(Roteamento);
+            var builder = new RouteBuilder(app);
+            builder.MapRoute("Livros/ParaLer", LivrosParaLer);
+            builder.MapRoute("Livros/Lendo", LivrosLendo);
+            builder.MapRoute("Livros/Lidos", LivrosLidos);
+            builder.MapRoute("Livros/Cadastrar/{autor}/{titulo}", LivrosCadastrar);
+            var rotas = builder.Build();
+            app.UseRouter(rotas);
         }
 
-        public Task Roteamento(HttpContext context)
+        public void ConfigureServices(IServiceCollection services)
         {
-            var caminhosAtendidos = new Dictionary<string, RequestDelegate>
+            services.AddRouting();
+        }
+
+        private Task LivrosCadastrar(HttpContext context)
+        {
+            var repo = new LivroRepositorioCSV();
+            var livro = new Livro()
             {
-                {"/Livros/ParaLer", LivrosParaLer },
-                {"/Livros/Lendo", LivrosLendo },
-                {"/Livros/Lidos", LivrosLidos }
+                Autor = context.GetRouteValue("autor").ToString(),
+                Titulo = context.GetRouteValue("titulo").ToString()
             };
-
-            if (caminhosAtendidos.ContainsKey(context.Request.Path))
-            {
-                var metodo = caminhosAtendidos[context.Request.Path];
-                return metodo.Invoke(context);
-            }
-
-            context.Response.StatusCode = 404;
-            return context.Response.WriteAsync($"Caminho '{context.Request.Path}' inexistente!");
+            repo.Incluir(livro);
+            return context.Response.WriteAsync("Livro cadastrado com sucesso!");
         }
 
         public Task LivrosParaLer(HttpContext context)
