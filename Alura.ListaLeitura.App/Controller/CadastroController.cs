@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Routing;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alura.ListaLeitura.App.Logica
+namespace Alura.ListaLeitura.App.Controller
 {
-    public class LivrosCadastro
+    public class CadastroController
     {
-        public static Task ProcessarFormulario(HttpContext context)
+        public static Task ProcessarCadastro(HttpContext context)
         {
             var repo = new LivroRepositorioCSV();
             var livro = new Livro()
@@ -22,13 +22,13 @@ namespace Alura.ListaLeitura.App.Logica
             return context.Response.WriteAsync("Livro cadastrado com sucesso!");
         }
 
-        public static Task FormularioLivrosCadastrar(HttpContext context)
+        public static Task FormularioCadastro(HttpContext context)
         {
             var html = HtmlUtils.CarregarFormularioHTML("cadastrar");
             return context.Response.WriteAsync(html);
         }
 
-        public static Task LivrosCadastrar(HttpContext context)
+        public static Task Cadastrar(HttpContext context)
         {
             var repo = new LivroRepositorioCSV();
             var livro = new Livro()

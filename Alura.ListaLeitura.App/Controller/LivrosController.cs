@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alura.ListaLeitura.App.Logica
+namespace Alura.ListaLeitura.App.Controller
 {
-    public class LivrosExibicao
+    public class LivrosController
     {
         private static string CarregarLista(IEnumerable<Livro> livros)
         {
@@ -24,7 +24,7 @@ namespace Alura.ListaLeitura.App.Logica
             return conteudoArquivo.Replace("LISTA_AQUI", "");
         }
 
-        public static Task LivrosDetalhes(HttpContext context)
+        public static Task Detalhes(HttpContext context)
         {
             int id = Convert.ToInt32(context.GetRouteValue("id"));
             var repo = new LivroRepositorioCSV();
@@ -32,25 +32,29 @@ namespace Alura.ListaLeitura.App.Logica
             return context.Response.WriteAsync(livro.Detalhes());
         }
 
-        public static Task LivrosParaLer(HttpContext context)
+        public static Task ParaLer(HttpContext context)
         {
             var repo = new LivroRepositorioCSV();
             var html = CarregarLista(repo.ParaLer.Livros);
             return context.Response.WriteAsync(html);
         }
 
-        public static Task LivrosLendo(HttpContext context)
+        public static Task Lendo(HttpContext context)
         {
             var repo = new LivroRepositorioCSV();
             var html = CarregarLista(repo.Lendo.Livros);
             return context.Response.WriteAsync(html);
         }
 
-        public static Task LivrosLidos(HttpContext context)
+        public string Lidos()
         {
-            var repo = new LivroRepositorioCSV();
-            var html = CarregarLista(repo.Lidos.Livros);
-            return context.Response.WriteAsync(html);
+            return CarregarLista(new LivroRepositorioCSV().Lidos.Livros);
         }
+
+        public string Teste()
+        {
+            return "Nova funcionalidade...";
+        }
+
     }
 }
