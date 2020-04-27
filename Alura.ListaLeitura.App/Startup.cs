@@ -34,8 +34,8 @@ namespace Alura.ListaLeitura.App
             var repo = new LivroRepositorioCSV();
             var livro = new Livro()
             {
-                Autor = context.Request.Query["autor"].First(),
-                Titulo = context.Request.Query["titulo"].First()
+                Autor = context.Request.Form["autor"].First(),
+                Titulo = context.Request.Form["titulo"].First()
             };
             repo.Incluir(livro);
             return context.Response.WriteAsync("Livro cadastrado com sucesso!");
@@ -43,13 +43,13 @@ namespace Alura.ListaLeitura.App
 
         private Task FormularioLivorsCadastrar(HttpContext context)
         {
-            var html = CarregarFormularioHTML("formulario");
+            var html = CarregarFormularioHTML("cadastrar");
             return context.Response.WriteAsync(html);
         }
 
         private string CarregarFormularioHTML(string nomeArquivo)
         {
-            var nomeCompletoArquivo = $"HTML/{nomeArquivo}/.html";
+            var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
             using (var arquivo = File.OpenText(nomeCompletoArquivo))
             {
                 return arquivo.ReadToEnd();
@@ -83,8 +83,17 @@ namespace Alura.ListaLeitura.App
 
         public Task LivrosParaLer(HttpContext context)
         {
+            var conteudoArquivo = CarregarFormularioHTML("para-ler");
             var repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(repo.ParaLer.ToString());
+
+            foreach (var livro in repo.ParaLer.Livros)
+            {
+                conteudoArquivo = conteudoArquivo.Replace("LISTA_AQUI", $"<li>{livro.Autor} ({livro.Titulo})</li>LISTA_AQUI");
+            }
+
+            conteudoArquivo = conteudoArquivo.Replace("LISTA_AQUI", "");
+
+            return context.Response.WriteAsync(conteudoArquivo);
         }
 
         public Task LivrosLendo(HttpContext context)
