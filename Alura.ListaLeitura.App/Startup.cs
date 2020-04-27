@@ -1,111 +1,26 @@
-﻿using Alura.ListaLeitura.App.Negocio;
-using Alura.ListaLeitura.App.Repositorio;
+﻿using Alura.ListaLeitura.App.Logica;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Alura.ListaLeitura.App
 {
     public class Startup
     {
-
         public void Configure(IApplicationBuilder app)
         {
             var builder = new RouteBuilder(app);
-            builder.MapRoute("Livros/ParaLer", LivrosParaLer);
-            builder.MapRoute("Livros/Lendo", LivrosLendo);
-            builder.MapRoute("Livros/Lidos", LivrosLidos);
-            builder.MapRoute("Livros/Cadastrar/{autor}/{titulo}", LivrosCadastrar);
-            builder.MapRoute("Livros/Detalhes/{id:int}", LivrosDetalhes);
-            builder.MapRoute("Livros/Cadastrar", FormularioLivorsCadastrar);
-            builder.MapRoute("Livros/Cadastrar/Incluir", ProcessarFormulario);
+            builder.MapRoute("Livros/Detalhes/{id:int}", LivrosExibicao.LivrosDetalhes);
+            builder.MapRoute("Livros/ParaLer", LivrosExibicao.LivrosParaLer);
+            builder.MapRoute("Livros/Lendo", LivrosExibicao.LivrosLendo);
+            builder.MapRoute("Livros/Lidos", LivrosExibicao.LivrosLidos);
+            builder.MapRoute("Livros/Cadastrar/{autor}/{titulo}", LivrosCadastro.LivrosCadastrar);
+            builder.MapRoute("Livros/Cadastrar", LivrosCadastro.FormularioLivrosCadastrar);
+            builder.MapRoute("Livros/Cadastrar/Incluir", LivrosCadastro.ProcessarFormulario);
             var rotas = builder.Build();
             app.UseRouter(rotas);
         }
 
-        private Task ProcessarFormulario(HttpContext context)
-        {
-            var repo = new LivroRepositorioCSV();
-            var livro = new Livro()
-            {
-                Autor = context.Request.Form["autor"].First(),
-                Titulo = context.Request.Form["titulo"].First()
-            };
-            repo.Incluir(livro);
-            return context.Response.WriteAsync("Livro cadastrado com sucesso!");
-        }
-
-        private Task FormularioLivorsCadastrar(HttpContext context)
-        {
-            var html = CarregarFormularioHTML("cadastrar");
-            return context.Response.WriteAsync(html);
-        }
-
-        private string CarregarFormularioHTML(string nomeArquivo)
-        {
-            var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
-            using (var arquivo = File.OpenText(nomeCompletoArquivo))
-            {
-                return arquivo.ReadToEnd();
-            }
-        }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddRouting();
-        }
-
-        private Task LivrosCadastrar(HttpContext context)
-        {
-            var repo = new LivroRepositorioCSV();
-            var livro = new Livro()
-            {
-                Autor = context.GetRouteValue("autor").ToString(),
-                Titulo = context.GetRouteValue("titulo").ToString()
-            };
-            repo.Incluir(livro);
-            return context.Response.WriteAsync("Livro cadastrado com sucesso!");
-        }
-
-        private Task LivrosDetalhes(HttpContext context)
-        {
-            int id = Convert.ToInt32(context.GetRouteValue("id"));
-            var repo = new LivroRepositorioCSV();
-            var livro = repo.Todos.First(l => l.Id == id);
-            return context.Response.WriteAsync(livro.Detalhes());
-        }
-
-        public Task LivrosParaLer(HttpContext context)
-        {
-            var conteudoArquivo = CarregarFormularioHTML("para-ler");
-            var repo = new LivroRepositorioCSV();
-
-            foreach (var livro in repo.ParaLer.Livros)
-            {
-                conteudoArquivo = conteudoArquivo.Replace("LISTA_AQUI", $"<li>{livro.Autor} ({livro.Titulo})</li>LISTA_AQUI");
-            }
-
-            conteudoArquivo = conteudoArquivo.Replace("LISTA_AQUI", "");
-
-            return context.Response.WriteAsync(conteudoArquivo);
-        }
-
-        public Task LivrosLendo(HttpContext context)
-        {
-            var repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(repo.Lendo.ToString());
-        }
-
-        public Task LivrosLidos(HttpContext context)
-        {
-            var repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(repo.Lidos.ToString());
-        }
+        public void ConfigureServices(IServiceCollection services) => services.AddRouting();
     }
 }
