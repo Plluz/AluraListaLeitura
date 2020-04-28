@@ -6,8 +6,12 @@
     <title></title>
 </head>
 <body>
+    <label>Livros:</label>
     <ul>
-        LISTA_AQUI
+        @foreach (var livro in ViewBag.Livros)
+        {
+            <li>@livro.Titulo (@livro.Autor)</li>
+        }
     </ul>
 </body>
 </html>

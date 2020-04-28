@@ -1,60 +1,37 @@
-﻿using Alura.ListaLeitura.App.Negocio;
-using Alura.ListaLeitura.App.Repositorio;
-using Alura.ListaLeitura.App.Utils;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
+﻿using Alura.ListaLeitura.App.Repositorio;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace Alura.ListaLeitura.App.Controller
+namespace Alura.ListaLeitura.App.Logica
 {
-    public class LivrosController
+    public class LivrosController : Controller
     {
-        private static string CarregarLista(IEnumerable<Livro> livros)
+        public string Detalhes(int id)
         {
-            var conteudoArquivo = HtmlUtils.CarregarFormularioHTML("para-ler");
-
-            foreach (var livro in livros)
-            {
-                conteudoArquivo = conteudoArquivo.Replace("LISTA_AQUI", $"<li>{livro.Autor} ({livro.Titulo})</li>LISTA_AQUI");
-            }
-
-            return conteudoArquivo.Replace("LISTA_AQUI", "");
-        }
-
-        public static Task Detalhes(HttpContext context)
-        {
-            int id = Convert.ToInt32(context.GetRouteValue("id"));
             var repo = new LivroRepositorioCSV();
             var livro = repo.Todos.First(l => l.Id == id);
-            return context.Response.WriteAsync(livro.Detalhes());
+            return livro.Detalhes();
         }
 
-        public static Task ParaLer(HttpContext context)
+        public IActionResult ParaLer()
         {
             var repo = new LivroRepositorioCSV();
-            var html = CarregarLista(repo.ParaLer.Livros);
-            return context.Response.WriteAsync(html);
+            ViewBag.Livros = repo.ParaLer.Livros;
+            return View("lista");
         }
 
-        public static Task Lendo(HttpContext context)
+        public IActionResult Lendo()
         {
             var repo = new LivroRepositorioCSV();
-            var html = CarregarLista(repo.Lendo.Livros);
-            return context.Response.WriteAsync(html);
+            ViewBag.Livros = repo.Lendo.Livros;
+            return View("lista");
         }
 
-        public string Lidos()
+        public IActionResult Lidos()
         {
-            return CarregarLista(new LivroRepositorioCSV().Lidos.Livros);
+            var repo = new LivroRepositorioCSV();
+            ViewBag.Livros = repo.Lidos.Livros;
+            return View("lista");
         }
-
-        public string Teste()
-        {
-            return "Nova funcionalidade...";
-        }
-
     }
 }
